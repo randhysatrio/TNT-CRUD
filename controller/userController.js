@@ -28,6 +28,13 @@ module.exports = {
   createUser: async (req, res) => {
     try {
       const { username, password } = req.body;
+
+      const usernameCheck = await User.findOne({ username });
+
+      if (usernameCheck) {
+        return res.status(409).send({ success: false, message: 'This username is already taken' });
+      }
+
       const newUser = await User.create({ username, password });
 
       res.status(201).send({ success: true, user_id: newUser._id });
@@ -49,7 +56,7 @@ module.exports = {
         user[prop] = req.body[prop];
       }
 
-      // menggunakan method ini agar mentrigger pre save hook mongoose
+      // menggunakan method ini untuk mentrigger pre save hook mongoose
       await user.save();
 
       res.status(200).send({ success: true });
